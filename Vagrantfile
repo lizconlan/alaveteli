@@ -90,16 +90,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :private_network, :ip => "10.10.10.30"
 
   if ALAVETELI_USE_NFS
-    config.vm.synced_folder ".", "/home/vagrant/alaveteli", nfs: true
+    config.vm.synced_folder ".", "/home/vagrant/alaveteli", :nfs => true
   else
     config.vm.synced_folder ".", "/home/vagrant/alaveteli", :owner => "vagrant", :group => "vagrant"
   end
 
   if File.directory?(ALAVETELI_THEMES_DIR)
-    config.vm.synced_folder ALAVETELI_THEMES_DIR,
-                            "/home/vagrant/alaveteli-themes",
-                            :owner => "vagrant",
-                            :group => "vagrant"
+    if ALAVETELI_USE_NFS
+      config.vm.synced_folder ALAVETELI_THEMES_DIR,
+                              "/home/vagrant/alaveteli-themes",
+                              :nfs => true
+    else
+      config.vm.synced_folder ALAVETELI_THEMES_DIR,
+                              "/home/vagrant/alaveteli-themes",
+                              :owner => "vagrant",
+                              :group => "vagrant"
+    end
   end
 
   config.ssh.forward_agent = true
