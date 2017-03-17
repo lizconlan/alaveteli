@@ -1042,3 +1042,25 @@ PRO_CONTACT_NAME: 'Alaveteli Professional'
 #
 # ---
 PRO_SITE_NAME: 'Alaveteli Professional'
+
+# Define the mailer retriever method to be used only in the production environment.
+# By default, mail is accepted passively via script/mailin. You can set this param
+# to 'pop' to poll for mail via pop.
+
+# If you choose to do this then you will need to also include the POP
+# configuration settings.
+#
+# As a string this is coerced into a symbol in config/environments/production.rb
+#
+# PRODUCTION_MAILER_RETRIEVER_METHOD - String (default: passive)
+#
+# Examples:
+#
+# PRODUCTION_MAILER_RETRIEVER_METHOD: pop
+# POP_MAILER_ADDRESS: pop.gmail.com
+# POP_MAILER_PORT: 995
+# POP_MAILER_USER_NAME: jane322
+# POP_MAILER_PASSWORD: supersecretpassword
+# POP_MAILER_ENABLE_SSL: true
+# ---
+PRODUCTION_MAILER_RETRIEVER_METHOD: pop

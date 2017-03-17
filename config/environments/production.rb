@@ -93,6 +93,19 @@ Alaveteli::Application.configure do
     }
   end
 
+  if AlaveteliConfiguration.production_mailer_retriever_method.to_sym == :pop
+    Mail.defaults do
+      retriever_method :pop3,
+        {
+          :address    => AlaveteliConfiguration.pop_mailer_address,
+          :port       => AlaveteliConfiguration.pop_mailer_port,
+          :user_name  => AlaveteliConfiguration.pop_mailer_user_name,
+          :password   => AlaveteliConfiguration.pop_mailer_password,
+          :enable_ssl => AlaveteliConfiguration.pop_mailer_enable_ssl
+        }
+    end
+  end
+
   exception_notifier_prefix = '[ERROR] '
   unless AlaveteliConfiguration.domain.blank?
     exception_notifier_prefix << "[#{ AlaveteliConfiguration.domain }] "
