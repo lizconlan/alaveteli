@@ -39,7 +39,7 @@ class InfoRequest < ActiveRecord::Base
   include Rails.application.routes.url_helpers
 
   # Two sorts of laws for requests, FOI or EIR
-  LAW_USED_READABLE_DATA =
+  def law_used_readable_data
     { :foi => { :short => _('FOI'),
                 :full => _('Freedom of Information'),
                 :with_a => _('A Freedom of Information request'),
@@ -49,6 +49,7 @@ class InfoRequest < ActiveRecord::Base
                 :with_a => _('An Environmental Information request'),
                 :act => _('Environmental Information Regulations') }
     }
+  end
 
   @non_admin_columns = %w(title url_title)
 
@@ -1644,7 +1645,7 @@ class InfoRequest < ActiveRecord::Base
 
   def applicable_law
     begin
-      LAW_USED_READABLE_DATA.fetch(law_used.to_sym)
+      law_used_readable_data.fetch(law_used.to_sym)
     rescue KeyError
       raise "Unknown law used '#{law_used}'"
     end

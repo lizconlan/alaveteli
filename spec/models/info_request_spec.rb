@@ -1209,6 +1209,15 @@ describe InfoRequest do
           with_message( "Unknown key 'random' for '#{info_request.law_used}'")
       end
 
+      context 'using the non default language' do
+
+        it 'returns the correctly translated law_used_short string' do
+          result = I18n.with_locale(:es) { info_request.law_used_human(:act) }
+          expect(result).to eq("Ley de Acceso a la Información")
+        end
+
+      end
+
     end
 
     context 'when using EIR law' do
