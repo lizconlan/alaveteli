@@ -1,0 +1,4 @@
+#!/bin/sh
+cd "`dirname "$0"`"
+
+bundle exec ./runner --daemon RequestMailer.poll_for_incoming_loop

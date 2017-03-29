@@ -856,4 +856,55 @@ describe RequestMailer do
 
   end
 
+  describe '.poll_for_incoming' do
+    let(:raw_mail){ load_file_fixture('incoming-request-plain.email')}
+    let(:mail){ Mail.new(raw_mail) }
+
+    it 'returns false if no mail is found' do
+      allow(Mail).to receive(:find)
+      expect(RequestMailer.poll_for_incoming).to be false
+    end
+
+    it 'returns true if mail is found' do
+      allow(Mail).to receive(:find).and_yield(mail)
+      expect(RequestMailer.poll_for_incoming).to be true
+    end
+
+    it 'tries to receive each incoming message found' do
+      allow(Mail).to receive(:find).and_yield(mail)
+      raw_source = Mail::Utilities.to_crlf(raw_mail)
+      expect(RequestMailer).to receive(:receive).with(raw_source, mail)
+      RequestMailer.poll_for_incoming
+    end
+
+    context 'when there is an error' do
+
+      before do
+        allow(RequestMailer).to receive(:receive).and_raise("An error")
+      end
+
+      it 'unsets mark_for_delete on the mail' do
+        mail.mark_for_delete = true
+        allow(Mail).to receive(:find).and_yield(mail)
+        RequestMailer.poll_for_incoming
+        expect(mail.is_marked_for_delete?).to be false
+      end
+
+      it 'sends an exception notification' do
+        allow(Mail).to receive(:find).and_yield(mail)
+        RequestMailer.poll_for_incoming
+        notification =  ActionMailer::Base.deliveries.first
+        expect(notification.subject).to eq('[ERROR] (RuntimeError) "An error"')
+      end
+
+      it 'includes the original mail in the exception notification' do
+        allow(Mail).to receive(:find).and_yield(mail)
+        RequestMailer.poll_for_incoming
+        notification =  ActionMailer::Base.deliveries.first
+        expect(notification.body).to match("Why aren't you leaving the house?")
+      end
+
+    end
+  end
+
 end

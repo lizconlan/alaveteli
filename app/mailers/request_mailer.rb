@@ -233,10 +233,44 @@ class RequestMailer < ApplicationMailer
   # actual original mail sent by the authority in the admin interface (so
   # can check that attachment decoding failures are problems in the message,
   # not in our code). ]
-  def self.receive(raw_email)
+  def self.receive(raw_email, mail = nil)
     logger.info "Received mail:\n #{raw_email}" unless logger.nil?
-    mail = MailHandler.mail_from_raw_email(raw_email)
+    mail = MailHandler.mail_from_raw_email(raw_email) unless mail
     new.receive(mail, raw_email)
+  end
+
+  def self.poll_for_incoming
+    found_mail = false
+    Mail.find(:delete_after_find => true,
+              :count => 10,
+              :order => :asc,
+              :what => :first) do |mail|
+      begin
+        found_mail = true
+        receive(mail.raw_source, mail)
+      rescue => e
+        # Notify admins and don't delete
+        if send_exception_notifications?
+          ExceptionNotifier.notify_exception(e, :data => {:mail =>
+                                                            mail.raw_source})
+        end
+        mail.mark_for_delete = false
+      end
+    end
+    found_mail
+  end
+
+  def self.poll_for_incoming_loop
+    # Run poll_for_incoming in an endless loop, sleeping when there is
+    # nothing to do
+    while true
+      sleep_seconds = 1
+      while !poll_for_incoming
+        sleep sleep_seconds
+        sleep_seconds *= 2
+        sleep_seconds = 300 if sleep_seconds > 300
+      end
+    end
   end
 
   # Find which info requests the email is for
