@@ -10,6 +10,7 @@ class ApplicationMailer < ActionMailer::Base
   # Include all the functions views get, as emails call similar things.
   helper :application
   include MailerHelper
+  include ConfigHelper
   include AlaveteliFeatures::Helpers
 
   # This really should be the default - otherwise you lose any information
