@@ -2,6 +2,7 @@
 
 ## Highlighted Features
 
+* Add sample public body headings and categories (Gareth Rees)
 * Add an unknown delivery status for better user experience when we haven't yet
   parsed MTA logs for a recent message (Gareth Rees)
 * Switch MTA-specific delivery status to MTA-agnostic delivery status
